@@ -7,6 +7,7 @@ namespace JWT_AUTHENTICATION.Services.UserRepositories
         Task<User> GetByEmail(string email);
         Task<User> GetByUserName(string userName);
         Task<User> CreateUser(User user);
+        Task<User> GetById(Guid userId);
         //Task<User> UserExists(string userName);
     }
 }

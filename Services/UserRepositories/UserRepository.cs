@@ -27,6 +27,11 @@ namespace JWT_AUTHENTICATION.Services.UserRepositories
             return Task.FromResult(_context.Users.Where(u => u.Email == email).FirstOrDefault())!;
         }
 
+        public Task<User> GetById(Guid userId)
+        {
+            return Task.FromResult(_context.Users.Where(u => u.Id == userId).FirstOrDefault())!;
+        }
+
         public Task<User> GetByUserName(string userName)
         {
             return Task.FromResult(_context.Users.Where(u => u.UserName == userName).FirstOrDefault())!;

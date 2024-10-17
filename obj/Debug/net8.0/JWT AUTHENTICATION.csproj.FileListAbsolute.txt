@@ -143,3 +143,4 @@ C:\Users\ashish\source\repos\JWT AUTHENTICATION\JWT AUTHENTICATION\obj\Debug\net
 C:\Users\ashish\source\repos\JWT AUTHENTICATION\JWT AUTHENTICATION\obj\Debug\net8.0\JWT AUTHENTICATION.genruntimeconfig.cache
 C:\Users\ashish\source\repos\JWT AUTHENTICATION\JWT AUTHENTICATION\obj\Debug\net8.0\ref\JWT AUTHENTICATION.dll
 C:\Users\ashish\source\repos\JWT AUTHENTICATION\JWT AUTHENTICATION\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\ashish\source\repos\JWT AUTHENTICATION\JWT AUTHENTICATION\obj\Debug\net8.0\JWT AUTHENTICATION.sourcelink.json

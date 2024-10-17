@@ -17,6 +17,22 @@
   },
   {
     "ContainingType": "JWT_AUTHENTICATION.Controllers.AuthenticationController",
+    "Method": "Refresh",
+    "RelativePath": "api/Authentication/refresh",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "refreshRequest",
+        "Type": "Microsoft.AspNetCore.Identity.Data.RefreshRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JWT_AUTHENTICATION.Controllers.AuthenticationController",
     "Method": "Register",
     "RelativePath": "api/Authentication/register",
     "HttpMethod": "POST",
@@ -29,6 +45,16 @@
         "IsRequired": true
       }
     ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JWT_AUTHENTICATION.Controllers.HomeController",
+    "Method": "Index",
+    "RelativePath": "api/Home/data",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
     "ReturnTypes": []
   }
 ]

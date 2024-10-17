@@ -1,25 +1,21 @@
 ﻿using JWT_AUTHENTICATION.Models;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
+using JWT_AUTHENTICATION.Services.TokenGenerator;
 
 namespace JWT_AUTHENTICATION.Services.TokenGenerator
 {
     public class AccessTokenGenerator
     {
         private readonly AuthenticationConfiguration _configuration;
-
-        public AccessTokenGenerator(AuthenticationConfiguration configuration)
+        private readonly JwtTokenGenerator _jwtTokenGenerator;
+        public AccessTokenGenerator(AuthenticationConfiguration configuration, JwtTokenGenerator jwtTokenGenerator)
         {
             _configuration = configuration;
+            _jwtTokenGenerator = jwtTokenGenerator;
         }
 
-        public string GeneratorToken(User user)
+        public string GenerateAccessToken(User user)
         {
-            SecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.AccessTokenKey));
-            SigningCredentials credentials = new(key,SecurityAlgorithms.HmacSha256);
-
             List<Claim> claims =
             [
                 new Claim("id",user.Id.ToString()),
@@ -27,19 +23,17 @@ namespace JWT_AUTHENTICATION.Services.TokenGenerator
                 new Claim(ClaimTypes.Name,user.UserName)
             ];
 
-
+            DateTime expirationTime = DateTime.UtcNow.AddMinutes(_configuration.AccessTokenExpiryMinutes);
             // Calculate token expiration time based on the current time
-            DateTime expirationTime = DateTime.UtcNow.AddMinutes(30);
+            //DateTime expirationTime = DateTime.UtcNow.AddMinutes(0.25);
 
-            JwtSecurityToken token = new JwtSecurityToken(
-                issuer: _configuration.Issuer, // issuer
-                audience: _configuration.Audience, // audience
-                claims, // claims contain the login detail credentials
-                notBefore: DateTime.UtcNow, // the time the jwt token was created
-                expires: expirationTime, // validity of the jwt token
-                signingCredentials: credentials // the signin credentials -> key
+            return _jwtTokenGenerator.GenerateToken(
+                _configuration.AccessTokenKey,
+                _configuration.Issuer,
+                _configuration.Audience,
+                expirationTime,
+                claims
                 );
-            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 }
