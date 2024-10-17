@@ -1,8 +1,11 @@
 ﻿using JWT_AUTHENTICATION.Models;
-using JWT_AUTHENTICATION.Responses;
+using JWT_AUTHENTICATION.Models.Responses;
 using JWT_AUTHENTICATION.Services.PasswordHasher;
+using JWT_AUTHENTICATION.Services.RefreshTokenRepository;
 using JWT_AUTHENTICATION.Services.TokenGenerator;
+using JWT_AUTHENTICATION.Services.TokenValidator;
 using JWT_AUTHENTICATION.Services.UserRepositories;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JWT_AUTHENTICATION.Controllers
@@ -14,12 +17,18 @@ namespace JWT_AUTHENTICATION.Controllers
         private readonly IUserRepository _userRepository;
         private readonly IPasswordHasher _passwordHasher;
         private readonly AccessTokenGenerator _accessTokenGenerator;
-
-        public AuthenticationController(IUserRepository userRepository, IPasswordHasher passwordHasher, AccessTokenGenerator accessTokenGenerator)
+        private readonly RefreshTokenGenerator _refreshTokenGenerator;
+        private readonly RefreshTokenValidator _refreshTokenValidator;
+        private readonly IRefreshTokenRepository _refreshTokenRepository;
+        public AuthenticationController(IUserRepository userRepository, IPasswordHasher passwordHasher,
+            AccessTokenGenerator accessTokenGenerator, RefreshTokenGenerator refreshTokenGenerator, RefreshTokenValidator refreshTokenValidator, IRefreshTokenRepository refreshTokenRepository)
         {
             _userRepository = userRepository;
             _passwordHasher = passwordHasher;
             _accessTokenGenerator = accessTokenGenerator;
+            _refreshTokenGenerator = refreshTokenGenerator;
+            _refreshTokenValidator = refreshTokenValidator;
+            _refreshTokenRepository = refreshTokenRepository;
         }
 
         [HttpPost("register")]
@@ -31,7 +40,7 @@ namespace JWT_AUTHENTICATION.Controllers
                 return BadRequestModelState();
             }
 
-            if (registerRequest.Password != registerRequest.ConformPassword)
+            if (registerRequest.Password.Trim() != registerRequest.ConformPassword.Trim())
             {
                 return BadRequest(new ErrorResponses("The password does not match with the confirm password"));
             }
@@ -83,13 +92,68 @@ namespace JWT_AUTHENTICATION.Controllers
                 return Unauthorized();
             }
 
-            // the jwt access token 
-            string accessToken = _accessTokenGenerator.GeneratorToken(user);
+            // the jwt access token  => MoVE THIS PIECE OF CODE FOR generatin access and refresh tokens to a new file or method
+            string accessToken = _accessTokenGenerator.GenerateAccessToken(user);
+            string refreshToken = _refreshTokenGenerator.GenerateRefreshToken();
+
+            RefreshToken refreshTokenDto = new RefreshToken()
+            {
+                Token = refreshToken,
+                UserId = user.Id,
+            };
+            await _refreshTokenRepository.Create(refreshTokenDto);
+
+
             return Ok(new AuthenticatedUserResponse
             {
                 AccessToken = accessToken,  
+                RefreshToken = refreshToken
             });
+        }
 
+        [HttpPost("refresh")]
+        public async Task<IActionResult> Refresh([FromBody] RefreshRequest refreshRequest)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequestModelState();
+            }
+
+            bool isValidRefresh = _refreshTokenValidator.Validate(refreshRequest.RefreshToken);
+            if (!isValidRefresh)
+            {
+                return BadRequest(new ErrorResponses("Invalid refresh token"));
+            }
+
+            RefreshToken refreshTokenDTO = await _refreshTokenRepository.GetByToken(refreshRequest.RefreshToken);
+            if (refreshTokenDTO == null)
+            {
+                return NotFound(new ErrorResponses("Such a Token Not found"));   
+            }
+
+            User user = await _userRepository.GetById(refreshTokenDTO.UserId);
+            if (user == null)
+            {
+                return NotFound(new ErrorResponses("User Not found"));
+            }
+
+            /// if the refresh token passes all the above checks then, generate a new JWT and refresh token
+            string accessToken = _accessTokenGenerator.GenerateAccessToken(user);
+            string refreshToken = _refreshTokenGenerator.GenerateRefreshToken();
+
+            RefreshToken refreshTokenDto = new RefreshToken()
+            {
+                Token = accessToken,
+                UserId = user.Id,
+            };
+            await _refreshTokenRepository.Create(refreshTokenDto);
+
+
+            return Ok(new AuthenticatedUserResponse
+            {
+                AccessToken = accessToken,
+                RefreshToken = refreshToken
+            });
         }
 
         private IActionResult BadRequestModelState()
