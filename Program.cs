@@ -1,7 +1,9 @@
 using JWT_AUTHENTICATION.Data;
 using JWT_AUTHENTICATION.Models;
 using JWT_AUTHENTICATION.Services.PasswordHasher;
+using JWT_AUTHENTICATION.Services.RefreshTokenRepository;
 using JWT_AUTHENTICATION.Services.TokenGenerator;
+using JWT_AUTHENTICATION.Services.TokenValidator;
 using JWT_AUTHENTICATION.Services.UserRepositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -23,6 +25,10 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<IPasswordHasher,BcryptPasswordHasher>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<AccessTokenGenerator>();
+builder.Services.AddScoped<JwtTokenGenerator>();
+builder.Services.AddScoped<RefreshTokenGenerator>();
+builder.Services.AddScoped<RefreshTokenValidator>();
+builder.Services.AddScoped<IRefreshTokenRepository,RefreshTokenRepository>();
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen();
@@ -62,6 +68,7 @@ builder.Services.AddSwaggerGen(opt =>
 AuthenticationConfiguration authenticationConfiguration = new AuthenticationConfiguration();
 configuration.Bind("Jwt", authenticationConfiguration);
 builder.Services.AddSingleton(authenticationConfiguration);
+
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(o =>
 {
