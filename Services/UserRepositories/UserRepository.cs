@@ -1,5 +1,6 @@
 ﻿using JWT_AUTHENTICATION.Data;
 using JWT_AUTHENTICATION.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace JWT_AUTHENTICATION.Services.UserRepositories
 {
@@ -35,6 +36,14 @@ namespace JWT_AUTHENTICATION.Services.UserRepositories
         public Task<User> GetByUserName(string userName)
         {
             return Task.FromResult(_context.Users.Where(u => u.UserName == userName).FirstOrDefault())!;
+        }
+
+        public Task Logout(Guid userId)
+        {
+            User? user = _context.Users.Where(u => u.Id == userId).FirstOrDefault();
+            _context.Remove(user);
+            _context.SaveChanges();
+            return Task.CompletedTask;
         }
     }
 }
