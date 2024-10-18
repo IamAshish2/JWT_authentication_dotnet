@@ -5,8 +5,10 @@ using JWT_AUTHENTICATION.Services.RefreshTokenRepository;
 using JWT_AUTHENTICATION.Services.TokenGenerator;
 using JWT_AUTHENTICATION.Services.TokenValidator;
 using JWT_AUTHENTICATION.Services.UserRepositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace JWT_AUTHENTICATION.Controllers
 {
@@ -21,7 +23,8 @@ namespace JWT_AUTHENTICATION.Controllers
         private readonly RefreshTokenValidator _refreshTokenValidator;
         private readonly IRefreshTokenRepository _refreshTokenRepository;
         public AuthenticationController(IUserRepository userRepository, IPasswordHasher passwordHasher,
-            AccessTokenGenerator accessTokenGenerator, RefreshTokenGenerator refreshTokenGenerator, RefreshTokenValidator refreshTokenValidator, IRefreshTokenRepository refreshTokenRepository)
+            AccessTokenGenerator accessTokenGenerator, RefreshTokenGenerator refreshTokenGenerator,
+            RefreshTokenValidator refreshTokenValidator, IRefreshTokenRepository refreshTokenRepository)
         {
             _userRepository = userRepository;
             _passwordHasher = passwordHasher;
@@ -131,11 +134,14 @@ namespace JWT_AUTHENTICATION.Controllers
                 return NotFound(new ErrorResponses("Such a Token Not found"));   
             }
 
+
             User user = await _userRepository.GetById(refreshTokenDTO.UserId);
             if (user == null)
             {
                 return NotFound(new ErrorResponses("User Not found"));
             }
+
+            await _refreshTokenRepository.Delete(refreshTokenDTO.Id);
 
             /// if the refresh token passes all the above checks then, generate a new JWT and refresh token
             string accessToken = _accessTokenGenerator.GenerateAccessToken(user);
@@ -143,7 +149,7 @@ namespace JWT_AUTHENTICATION.Controllers
 
             RefreshToken refreshTokenDto = new RefreshToken()
             {
-                Token = accessToken,
+                Token = refreshToken,
                 UserId = user.Id,
             };
             await _refreshTokenRepository.Create(refreshTokenDto);
@@ -154,6 +160,26 @@ namespace JWT_AUTHENTICATION.Controllers
                 AccessToken = accessToken,
                 RefreshToken = refreshToken
             });
+        }
+
+        [Authorize]
+        [HttpDelete("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            string userId = HttpContext.User.FindFirstValue("id")!;
+            
+            if (userId == null)
+            {
+                return BadRequest();
+            }
+
+            if (!Guid.TryParse(userId, out Guid Id)){
+                return Unauthorized();
+            }
+
+          
+            await _userRepository.Logout(Id);
+            return NoContent();
         }
 
         private IActionResult BadRequestModelState()
