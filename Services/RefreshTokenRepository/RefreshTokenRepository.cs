@@ -12,12 +12,20 @@ namespace JWT_AUTHENTICATION.Services.RefreshTokenRepository
         }
         public Task Create(RefreshToken refreshToken)
         {
-            refreshToken.UserId = Guid.NewGuid();
             _context.Add(refreshToken);
             _context.SaveChanges();
             return Task.CompletedTask;
         }
 
+        public Task Delete(Guid id)
+        {
+            RefreshToken refreshToken = _context.RefreshTokens.Where(rt => rt.Id == id).FirstOrDefault();
+            _context.RefreshTokens.Remove(refreshToken);
+            _context.SaveChanges();
+            return Task.CompletedTask;
+        }
+
+        // this is not working????
         public Task<RefreshToken> GetByToken(string Token)
         {
             RefreshToken refreshToken = _context.RefreshTokens.FirstOrDefault(r => r.Token == Token);

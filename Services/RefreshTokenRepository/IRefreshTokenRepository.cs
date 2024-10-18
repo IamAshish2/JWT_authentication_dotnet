@@ -6,6 +6,7 @@ namespace JWT_AUTHENTICATION.Services.RefreshTokenRepository
     public interface IRefreshTokenRepository
     {
         Task<RefreshToken> GetByToken(string Token);
-        Task Create(RefreshToken refreshToken);  
+        Task Create(RefreshToken refreshToken);
+        Task Delete(Guid id);
     }
 }
