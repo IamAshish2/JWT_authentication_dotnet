@@ -17,6 +17,16 @@
   },
   {
     "ContainingType": "JWT_AUTHENTICATION.Controllers.AuthenticationController",
+    "Method": "Logout",
+    "RelativePath": "api/Authentication/logout",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JWT_AUTHENTICATION.Controllers.AuthenticationController",
     "Method": "Refresh",
     "RelativePath": "api/Authentication/refresh",
     "HttpMethod": "POST",
