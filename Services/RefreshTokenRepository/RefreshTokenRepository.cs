@@ -26,6 +26,7 @@ namespace JWT_AUTHENTICATION.Services.RefreshTokenRepository
         }
 
         // this is not working????
+        // get token from the database
         public Task<RefreshToken> GetByToken(string Token)
         {
             RefreshToken refreshToken = _context.RefreshTokens.FirstOrDefault(r => r.Token == Token);

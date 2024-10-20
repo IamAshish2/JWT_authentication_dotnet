@@ -8,7 +8,8 @@ namespace JWT_AUTHENTICATION.Services.TokenGenerator
 {
     public class JwtTokenGenerator
     {
-        public string GenerateToken(string secretKey, string issuer, string audience, DateTime utcExpirationTime, IEnumerable<Claim>? claims = null)
+        public string GenerateToken(string secretKey, string issuer, string audience, DateTime utcExpirationTime,
+            IEnumerable<Claim>? claims = null)
         {
 
             SecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));

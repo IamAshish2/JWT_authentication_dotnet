@@ -19,7 +19,7 @@
     "ContainingType": "JWT_AUTHENTICATION.Controllers.AuthenticationController",
     "Method": "Logout",
     "RelativePath": "api/Authentication/logout",
-    "HttpMethod": "DELETE",
+    "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
     "Parameters": [],

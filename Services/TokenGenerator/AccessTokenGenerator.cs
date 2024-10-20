@@ -24,8 +24,6 @@ namespace JWT_AUTHENTICATION.Services.TokenGenerator
             ];
 
             DateTime expirationTime = DateTime.UtcNow.AddMinutes(_configuration.AccessTokenExpiryMinutes);
-            // Calculate token expiration time based on the current time
-            //DateTime expirationTime = DateTime.UtcNow.AddMinutes(0.25);
 
             return _jwtTokenGenerator.GenerateToken(
                 _configuration.AccessTokenKey,

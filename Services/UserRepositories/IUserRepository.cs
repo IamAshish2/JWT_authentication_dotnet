@@ -1,4 +1,5 @@
 ﻿using JWT_AUTHENTICATION.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace JWT_AUTHENTICATION.Services.UserRepositories
 {
@@ -8,6 +9,6 @@ namespace JWT_AUTHENTICATION.Services.UserRepositories
         Task<User> GetByUserName(string userName);
         Task<User> CreateUser(User user);
         Task<User> GetById(Guid userId);
-        Task Logout(Guid userId);
+        //Task<bool> Logout(Guid userId);
     }
 }

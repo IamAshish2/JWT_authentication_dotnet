@@ -86,7 +86,7 @@ namespace JWT_AUTHENTICATION.Controllers
             User user = await  _userRepository.GetByUserName(loginRequest.UserName);
             if (user == null)
             {
-                return Unauthorized();
+                return NotFound();
             }
 
             bool isCorrectPassword = _passwordHasher.VerifyPassword(loginRequest.Password, user.PasswordHash);
@@ -162,25 +162,32 @@ namespace JWT_AUTHENTICATION.Controllers
             });
         }
 
-        [Authorize]
-        [HttpDelete("logout")]
-        public async Task<IActionResult> Logout()
-        {
-            string userId = HttpContext.User.FindFirstValue("id")!;
+        //[Authorize]
+        //[HttpPost("logout")]
+        //public async Task<ActionResult> Logout()
+        //{
+        //    // getting the userId from claims 
+        //    string userId = HttpContext.User.FindFirstValue("id")!;
             
-            if (userId == null)
-            {
-                return BadRequest();
-            }
 
-            if (!Guid.TryParse(userId, out Guid Id)){
-                return Unauthorized();
-            }
+        //    if (userId == null)
+        //    {
+        //        return BadRequest();
+        //    }
 
-          
-            await _userRepository.Logout(Id);
-            return NoContent();
-        }
+        //    if (!Guid.TryParse(userId, out Guid Id)){
+        //        return Unauthorized(new ErrorResponses("Unauthorized"));
+        //    }
+
+
+        //    //bool isLoggedOut = await _userRepository.Logout(Id);
+        //    //if (!isLoggedOut)
+        //    //{
+        //    //    return BadRequest(new ErrorResponses("Server error!"));
+        //    //}
+        //    HttpContext.Session.Clear();
+        //    return NoContent();
+        //}
 
         private IActionResult BadRequestModelState()
         {
